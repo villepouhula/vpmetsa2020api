@@ -4,7 +4,7 @@
 // =============================================================================
 
 var mongoose   = require('mongoose');
-mongoose.connect('mongodb://localhost:27017/metsa2020'); // connect to our database
+mongoose.connect('mongodb://ville:metsa2020@ds157809.mlab.com:57809/metsa2020db'); // connect to our database
 
 var Location     = require('./app/models/location');
 

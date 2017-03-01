@@ -33,7 +33,17 @@ router.use(function(req, res, next) {
     // do logging
     console.log(req.body);
     console.log('Something is happening.');
-    next(); // make sure we go to the next routes and don't stop here
+    
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'accept, content-type, x-parse-application-id, x-parse-rest-api-key, x-parse-session-token');
+     // intercept OPTIONS method
+    if ('OPTIONS' == req.method) {
+      res.send(200);
+    }
+    else {
+      next();
+    }
 });
 
 // test route to make sure everything is working (accessed at GET http://localhost:8080/api)

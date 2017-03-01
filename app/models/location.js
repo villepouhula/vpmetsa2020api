@@ -7,8 +7,11 @@ var LocationSchema   = new Schema({
     loc: {
         type: [Number],  // [<longitude>, <latitude>]
         index: '2dsphere'      // create the geospatial index
-    },
+    }
+},
+{
     timestamps: true
-});
+}
+);
 
 module.exports = mongoose.model('Location', LocationSchema);

@@ -60,6 +60,7 @@ router.route('/locations')
         var location = new Location();      // create a new instance of the Bear model
         location.user = req.body.user;  // set the bears name (comes from the request)
         location.loc = req.body.loc;
+        location.date = req.body.date;
 
         // save the bear and check for errors
         location.save(function(err) {

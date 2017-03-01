@@ -15,7 +15,17 @@ var Location     = require('./app/models/location');
 // call the packages we need
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
+var https      = require('https');
+var fs         = require('fs');
 var bodyParser = require('body-parser');
+
+var options = {
+  ca: fs.readFileSync("ssl/server.csr"),
+  cert: fs.readFileSync("ssl/server.crt"),
+  key: fs.readFileSync("ssl/server.key")
+};
+
+var server = https.createServer(options, app);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -52,6 +62,37 @@ router.get('/', function(req, res) {
 });
 
 // more routes for our API will happen here
+
+router.route('/findUsers')
+
+    .get(function(req,res) {
+        sw_lng = req.query.sw_lng;
+        sw_lat = req.query.sw_lat;        
+        ne_lng = req.query.ne_lng;
+        ne_lat = req.query.ne_lat;
+        
+        Location.find({
+          loc: {
+           $geoWithin: {
+              $geometry: {
+                 type : "Polygon" ,
+                 coordinates: [ [ 
+                    [ sw_lng, sw_lat ], 
+                    [ sw_lng, ne_lat ],
+                    [ ne_lng, ne_lat ],
+                    [ ne_lng, sw_lat ],
+                    [ sw_lng, sw_lat ]                  
+                ] ]
+              }
+           }
+         }
+        }, function(err, bears) {
+            if (err)
+                res.send(err);
+
+            res.json(bears);
+        });
+    });
 
 router.route('/locations')
 
@@ -132,5 +173,7 @@ app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port);
+//app.listen(port);
+server.listen(port, function(){
+      console.log('Magic happens on port ' + port);
+});

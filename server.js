@@ -15,17 +15,18 @@ var Location     = require('./app/models/location');
 // call the packages we need
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
-var https      = require('https');
-var fs         = require('fs');
+//var https      = require('https');
+//var fs         = require('fs');
 var bodyParser = require('body-parser');
 
-var options = {
-  ca: fs.readFileSync("ssl/server.csr"),
-  cert: fs.readFileSync("ssl/server.crt"),
-  key: fs.readFileSync("ssl/server.key")
-};
 
-var server = https.createServer(options, app);
+//var options = {
+//  ca: fs.readFileSync("ssl/server.csr"),
+//  cert: fs.readFileSync("ssl/server.crt"),
+//  key: fs.readFileSync("ssl/server.key")
+//};
+
+//var server = https.createServer(options, app);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -173,7 +174,9 @@ app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================
-//app.listen(port);
-server.listen(port, function(){
-      console.log('Magic happens on port ' + port);
-});
+app.listen(port);
+console.log('Magic happens on port ' + port);
+
+//server.listen(port, function(){
+//      console.log('Magic happens on port ' + port);
+//});

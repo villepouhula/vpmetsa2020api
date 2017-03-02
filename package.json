@@ -2,9 +2,10 @@
   "name": "mesta2020-api",
   "main": "server.js",
   "dependencies": {
+    "body-parser": "~1.0.1",
     "express": "~4.0.0",
-    "mongoose": "~4.0.0",
-    "body-parser": "~1.0.1"
+    "moment": "^2.17.1",
+    "mongoose": "~4.0.0"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

@@ -15,16 +15,17 @@ var Location     = require('./app/models/location');
 // call the packages we need
 var express    = require('express');        // call express
 var app        = express();                 // define our app using express
-//var https      = require('https');
-//var fs         = require('fs');
+var https      = require('https');
+var fs         = require('fs');
 var bodyParser = require('body-parser');
+var moment     = require('moment');
 
 
-//var options = {
-//  ca: fs.readFileSync("ssl/server.csr"),
-//  cert: fs.readFileSync("ssl/server.crt"),
-//  key: fs.readFileSync("ssl/server.key")
-//};
+var options = {
+  ca: fs.readFileSync("ssl/server.csr"),
+  cert: fs.readFileSync("ssl/server.crt"),
+  key: fs.readFileSync("ssl/server.key")
+};
 
 //var server = https.createServer(options, app);
 
@@ -67,24 +68,20 @@ router.get('/', function(req, res) {
 router.route('/findUsers')
 
     .get(function(req,res) {
-        sw_lng = req.query.sw_lng;
-        sw_lat = req.query.sw_lat;        
-        ne_lng = req.query.ne_lng;
-        ne_lat = req.query.ne_lat;
+        sw_lng = parseFloat(req.query.sw_lng);
+        sw_lat = parseFloat(req.query.sw_lat);        
+        ne_lng = parseFloat(req.query.ne_lng);
+        ne_lat = parseFloat(req.query.ne_lat);
         
+           /*
         Location.find({
           loc: {
            $geoWithin: {
-              $geometry: {
-                 type : "Polygon" ,
-                 coordinates: [ [ 
-                    [ sw_lng, sw_lat ], 
-                    [ sw_lng, ne_lat ],
-                    [ ne_lng, ne_lat ],
-                    [ ne_lng, sw_lat ],
-                    [ sw_lng, sw_lat ]                  
-                ] ]
-              }
+              $box: [ 
+                [ sw_lng, sw_lat ], 
+                [ ne_lng, ne_lat ]                 
+              ]
+              
            }
          }
         }, function(err, bears) {
@@ -93,6 +90,47 @@ router.route('/findUsers')
 
             res.json(bears);
         });
+        */
+        
+        var time_limit = moment().subtract(1, 'days');
+        
+        Location.aggregate([
+          {
+            $match: {
+              date: {"$gte": time_limit.toDate()}
+            }
+          },
+          {
+            $group: {
+              _id: "$user",
+              username: {$last: "$username"},
+              loc: {$last: "$loc"},
+              date: {$last: "$date"},
+              activity: {$last: "$activity"}
+            }
+          },
+          {
+            $match: {
+              loc: {
+                 $geoWithin: {
+                    $box: [ 
+                      [ sw_lng, sw_lat ], 
+                      [ ne_lng, ne_lat ]                
+                    ]
+                    
+                 }
+               }
+            }
+          }
+          
+          
+        ], function(err, bears) {
+            if (err)
+                res.send(err);
+
+            res.json(bears);
+        });
+        
     });
 
 router.route('/locations')
@@ -101,8 +139,10 @@ router.route('/locations')
     .post(function(req, res) {
         var location = new Location();      // create a new instance of the Bear model
         location.user = req.body.user;  // set the bears name (comes from the request)
+        location.username = req.body.username;
         location.loc = req.body.loc;
         location.date = req.body.date;
+        location.activity = req.body.activity;
 
         // save the bear and check for errors
         location.save(function(err) {
@@ -112,59 +152,7 @@ router.route('/locations')
             res.json({ message: 'location created!' });
         });
 
-    })
-
-    // get all the bears (accessed at GET http://localhost:8080/api/bears)
-    .get(function(req, res) {
-        Location.find(function(err, bears) {
-            if (err)
-                res.send(err);
-
-            res.json(bears);
-        });
-    })
-
-    .get(function(req, res) {
-        Location.findById(req.params.bear_id, function(err, bear) {
-            if (err)
-                res.send(err);
-            res.json(bear);
-        });
-    })
-
-    // update the bear with this id (accessed at PUT http://localhost:8080/api/bears/:bear_id)
-    .put(function(req, res) {
-
-        // use our bear model to find the bear we want
-        Bear.findById(req.params.bear_id, function(err, bear) {
-
-            if (err)
-                res.send(err);
-
-            bear.name = req.body.name;  // update the bears info
-
-            // save the bear
-            bear.save(function(err) {
-                if (err)
-                    res.send(err);
-
-                res.json({ message: 'Bear updated!' });
-            });
-
-        });
-    })
-
-    // delete the bear with this id (accessed at DELETE http://localhost:8080/api/bears/:bear_id)
-    .delete(function(req, res) {
-        Bear.remove({
-            _id: req.params.bear_id
-        }, function(err, bear) {
-            if (err)
-                res.send(err);
-
-            res.json({ message: 'Successfully deleted' });
-        });
-    })
+    })    
     ;
 
 

@@ -27,7 +27,7 @@ var options = {
   key: fs.readFileSync("ssl/server.key")
 };
 
-//var server = https.createServer(options, app);
+var server = https.createServer(options, app);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -92,7 +92,7 @@ router.route('/findUsers')
         });
         */
         
-        var time_limit = moment().subtract(1, 'days');
+        var time_limit = moment().subtract(5, 'days');
         
         Location.aggregate([
           {
@@ -162,9 +162,9 @@ app.use('/api', router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log('Magic happens on port ' + port);
+//app.listen(port);
+//console.log('Magic happens on port ' + port);
 
-//server.listen(port, function(){
-//      console.log('Magic happens on port ' + port);
-//});
+server.listen(port, function(){
+      console.log('Magic happens on port ' + port);
+});

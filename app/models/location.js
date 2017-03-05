@@ -9,7 +9,8 @@ var LocationSchema   = new Schema({
         type: [Number],  // [<longitude>, <latitude>]
         index: '2dsphere'      // create the geospatial index
     },
-    activity: String
+    activity: String,
+    fbuser: Boolean
 },
 {
     timestamps: true

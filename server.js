@@ -27,7 +27,7 @@ var options = {
   key: fs.readFileSync("ssl/server.key")
 };
 
-//var server = https.createServer(options, app);
+var server = https.createServer(options, app);
 
 // configure app to use bodyParser()
 // this will let us get the data from a POST
@@ -106,7 +106,8 @@ router.route('/findUsers')
               username: {$last: "$username"},
               loc: {$last: "$loc"},
               date: {$last: "$date"},
-              activity: {$last: "$activity"}
+              activity: {$last: "$activity"},
+              fbuser: {$last: "$fbuser"}
             }
           },
           {
@@ -143,6 +144,7 @@ router.route('/locations')
         location.loc = req.body.loc;
         location.date = req.body.date;
         location.activity = req.body.activity;
+        location.fbuser = req.body.fbuser;
 
         // save the bear and check for errors
         location.save(function(err) {

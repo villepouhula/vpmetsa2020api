@@ -4,8 +4,9 @@
 // =============================================================================
 
 var mongoose   = require('mongoose');
+var mongodbUrl = process.env.MONGODBURL;
 
-mongoose.connect('mongodb://ville:metsa2020@ds157809.mlab.com:57809/metsa2020db', function (error) {
+mongoose.connect(mongodbUrl, function (error) {
     if (error) console.error(error);
     else console.log('mongo connected');
 });
@@ -45,7 +46,7 @@ router.use(function(req, res, next) {
     // do logging
     console.log(req.body);
     console.log('Something is happening.');
-    
+
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
     res.header('Access-Control-Allow-Headers', 'accept, content-type, x-parse-application-id, x-parse-rest-api-key, x-parse-session-token');
@@ -69,19 +70,19 @@ router.route('/findUsers')
 
     .get(function(req,res) {
         sw_lng = parseFloat(req.query.sw_lng);
-        sw_lat = parseFloat(req.query.sw_lat);        
+        sw_lat = parseFloat(req.query.sw_lat);
         ne_lng = parseFloat(req.query.ne_lng);
         ne_lat = parseFloat(req.query.ne_lat);
-        
+
            /*
         Location.find({
           loc: {
            $geoWithin: {
-              $box: [ 
-                [ sw_lng, sw_lat ], 
-                [ ne_lng, ne_lat ]                 
+              $box: [
+                [ sw_lng, sw_lat ],
+                [ ne_lng, ne_lat ]
               ]
-              
+
            }
          }
         }, function(err, bears) {
@@ -91,9 +92,9 @@ router.route('/findUsers')
             res.json(bears);
         });
         */
-        
+
         var time_limit = moment().subtract(5, 'days');
-        
+
         Location.aggregate([
           {
             $match: {
@@ -114,24 +115,24 @@ router.route('/findUsers')
             $match: {
               loc: {
                  $geoWithin: {
-                    $box: [ 
-                      [ sw_lng, sw_lat ], 
-                      [ ne_lng, ne_lat ]                
+                    $box: [
+                      [ sw_lng, sw_lat ],
+                      [ ne_lng, ne_lat ]
                     ]
-                    
+
                  }
                }
             }
           }
-          
-          
+
+
         ], function(err, bears) {
             if (err)
                 res.send(err);
 
             res.json(bears);
         });
-        
+
     });
 
 router.route('/locations')
@@ -154,7 +155,7 @@ router.route('/locations')
             res.json({ message: 'location created!' });
         });
 
-    })    
+    })
     ;
 
 

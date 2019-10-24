@@ -74,28 +74,10 @@ router.route('/findUsers')
         ne_lng = parseFloat(req.query.ne_lng);
         ne_lat = parseFloat(req.query.ne_lat);
 
-           /*
-        Location.find({
-          loc: {
-           $geoWithin: {
-              $box: [
-                [ sw_lng, sw_lat ],
-                [ ne_lng, ne_lat ]
-              ]
-
-           }
-         }
-        }, function(err, bears) {
-            if (err)
-                res.send(err);
-
-            res.json(bears);
-        });
-        */
 
         var time_limit = moment().subtract(5, 'days');
 
-        Location.aggregate([
+        var aggr = Location.aggregate([
           {
             $match: {
               date: {"$gte": time_limit.toDate()}
@@ -126,11 +108,13 @@ router.route('/findUsers')
           }
 
 
-        ], function(err, bears) {
-            if (err)
-                res.send(err);
+        ])
+        .cursor({})
+        .exec((err, result) => {if (err) res.send(err)})
+        .toArray((err, result) => {
+            if (err) res.send(err)
 
-            res.json(bears);
+            res.json(result)
         });
 
     });

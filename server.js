@@ -120,18 +120,15 @@ router.route('/findUsers')
     });
 
 router.route('/locations')
-
-// create a bear (accessed at POST http://localhost:8080/api/bears)
     .post(function(req, res) {
-        var location = new Location();      // create a new instance of the Bear model
-        location.user = req.body.user;  // set the bears name (comes from the request)
+        var location = new Location();
+        location.user = req.body.user;
         location.username = req.body.username;
         location.loc = req.body.loc;
         location.date = req.body.date;
         location.activity = req.body.activity;
         location.fbuser = req.body.fbuser;
 
-        // save the bear and check for errors
         location.save(function(err) {
             if (err)
                 res.send(err);
@@ -152,6 +149,3 @@ app.use('/api', router);
 app.listen(port);
 console.log('Magic happens on port ' + port);
 
-//server.listen(port, function(){
-//      console.log('Magic happens on port ' + port);
-//});
